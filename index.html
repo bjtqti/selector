@@ -1,0 +1,39 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+		<meta name="apple-touch-fullscreen" content="yes">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="format-detection" content="telephone=no, address=no">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+		<meta http-equiv="Expires" content="-1">
+    	<meta http-equiv="pragram" content="no-cache">
+    	<meta http-equiv="Cache-Control" content="no-cache,must-revalidate">
+		<title>省市区三级联动</title>
+		<script src="region.js"></script>
+        <script src="selector.js"></script>
+	</head>
+	<body>
+		<div id="selector">
+			<select>
+				<option value="0">请选择省份</option>
+			</select>
+			<select>
+				<option value="0">请选择城市</option>
+			</select>
+			<select>
+				<option value="0">请选择区县</option>
+			</select>
+		</div>
+		<script>
+			window.onload=function(){
+				var wrap = document.getElementById('selector');
+				new Selector(wrap,{
+					provence:'湖南省',
+					city:'株洲市',
+					district:'炎陵县'
+				});
+			}
+		</script>
+	</body>
+</html>
