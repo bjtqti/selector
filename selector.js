@@ -165,13 +165,14 @@ Selector.prototype.createCity=function(){
 Selector.prototype.createDistrict=function(){
 	var data = this.getDistrictData();
 	var district = this.container.children[2];
-	var name = this.selected[2].name;
-	var options = this.createOptions(data,name);
-	this.clearItems(district);
-	district.appendChild(options.items);
 	if(!data){
 		district.style.display='none';
+		this.selected.pop();
 	}else{
+		var name = this.selected[2].name;
+		var options = this.createOptions(data,name);
+		this.clearItems(district);
+		district.appendChild(options.items);
 		district.style.display='block';
 		this.selected[2].id = options.id||data[0].id;
 		this.selected[2].name=name||data[0].value;
@@ -190,5 +191,6 @@ Selector.prototype.clearItems = function(node){
 }
 
 Selector.prototype.getSeleted = function(){
-	return this.selected;
+	return this.selected.concat();
 }
+
