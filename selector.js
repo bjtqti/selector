@@ -67,8 +67,10 @@ Selector.prototype.createOptions = function(data,init){
  */
 Selector.prototype.handleChangeProvence=function(e){
 	var id = e.target.value;
-	this.selected[0].id = id;
-	this.selected[0].name=e.target.text;
+	var index = e.target.selectedIndex;
+	var name = e.target.options[index].text;
+	this.selected[0] = {id:id,name:name}
+	this.selected[1]={};
 	this.createCity();
 	this.createDistrict();
 }
@@ -79,8 +81,10 @@ Selector.prototype.handleChangeProvence=function(e){
  */
 Selector.prototype.handleChangeCity=function(e){
 	var id = e.target.value;
-	this.selected[1].id = id;
-	this.selected[1].name=e.target.text;
+	var index = e.target.selectedIndex;
+	var name = e.target.options[index].text;
+	this.selected[1]={id:id,name:name};
+	this.selected[2]={};
 	this.createDistrict();
 }
 
@@ -90,8 +94,9 @@ Selector.prototype.handleChangeCity=function(e){
  */
 Selector.prototype.handleChangeDistrict=function(e){
 	var id = e.target.value;
-	this.selected[2].id = id;
-	this.selected[2].name=e.target.text;
+	var index = e.target.selectedIndex;
+	var name = e.target.options[index].text;
+	this.selected[2] = {id:id,name:name};
 }
 
 /**
@@ -167,7 +172,6 @@ Selector.prototype.createDistrict=function(){
 	var district = this.container.children[2];
 	if(!data){
 		district.style.display='none';
-		this.selected.pop();
 	}else{
 		var name = this.selected[2].name;
 		var options = this.createOptions(data,name);
@@ -191,6 +195,12 @@ Selector.prototype.clearItems = function(node){
 }
 
 Selector.prototype.getSeleted = function(){
-	return this.selected.concat();
+	var selected = [];
+	this.selected.forEach(function(item){
+		if(item.name&&item.id){
+			selected.push(item);
+		}
+	})
+	return selected;
 }
 
