@@ -4,19 +4,27 @@
  *  省市区三级联动
  *
  *  @param DomElement container
+ *  @param String arg1 省辖市
+ *  @param String arg2 市、县
+ *  @param String arg3 区域
  *
  */
-function Selector(container,option){
+function Selector(container,arg1,arg2,arg3){
 	this.container= container;
 	this.data =  window.area_data||[];
-	this.config = option||{};
-	this.init();
+	this.selected = [];
+	this.init([arg1,arg2,arg3]);
 }
 
 /**
  * 初始化
  */
-Selector.prototype.init = function(){
+Selector.prototype.init = function(options){
+	var selected = [];
+	options.forEach(function(item){
+		selected.push({name:item,id:0})
+	});
+	this.selected = selected;
 	this.createProvence();
 	this.createCity();
 	this.createDistrict();
@@ -26,7 +34,7 @@ Selector.prototype.init = function(){
 /**
  * 创建选项
  * @param Array data 城市数据
- * @param String init 默认城市名
+ * @param String init 城市名
  */
 Selector.prototype.createOptions = function(data,init){
 	var result = {};
@@ -59,7 +67,8 @@ Selector.prototype.createOptions = function(data,init){
  */
 Selector.prototype.handleChangeProvence=function(e){
 	var id = e.target.value;
-	this.provenceId = id;
+	this.selected[0].id = id;
+	this.selected[0].name=e.target.text;
 	this.createCity();
 	this.createDistrict();
 }
@@ -70,7 +79,8 @@ Selector.prototype.handleChangeProvence=function(e){
  */
 Selector.prototype.handleChangeCity=function(e){
 	var id = e.target.value;
-	this.cityId = id;
+	this.selected[1].id = id;
+	this.selected[1].name=e.target.text;
 	this.createDistrict();
 }
 
@@ -80,7 +90,8 @@ Selector.prototype.handleChangeCity=function(e){
  */
 Selector.prototype.handleChangeDistrict=function(e){
 	var id = e.target.value;
-	this.districtId = id;
+	this.selected[2].id = id;
+	this.selected[2].name=e.target.text;
 }
 
 /**
@@ -95,7 +106,7 @@ Selector.prototype.getProvenceData=function(){
  */
 Selector.prototype.getCityData=function(){
 	var data = this.data;
-	var id = this.provenceId;
+	var id = this.selected[0].id;
 	for(var i=0;i<data.length;i++){
 		if(data[i].id===id){
 			return data[i].children;
@@ -109,7 +120,7 @@ Selector.prototype.getCityData=function(){
  */
 Selector.prototype.getDistrictData=function(){
 	var data = this.getCityData();
-	var id = this.cityId;
+	var id = this.selected[1].id;
 	for(var i=0;i<data.length;i++){
 		if(data[i].id===id){
 			return data[i].children;
@@ -124,14 +135,12 @@ Selector.prototype.getDistrictData=function(){
 Selector.prototype.createProvence=function(){
 	var data = this.getProvenceData();
 	var provence = this.container.children[0];
-	var name = this.config.provence;
+	var name = this.selected[0].name;
 	var options = this.createOptions(data,name);
 	this.clearItems(provence);
 	provence.appendChild(options.items);
-	if(data){
-		this.provenceId = options.id || data[0].id;
-	}
-	this.data = data;
+	this.selected[0].id = options.id || data[0].id;
+	this.selected[0].name = name || data[0].value;
 	provence.onchange=this.handleChangeProvence.bind(this);
 }
 
@@ -141,13 +150,12 @@ Selector.prototype.createProvence=function(){
 Selector.prototype.createCity=function(){
 	var data = this.getCityData();
 	var city = this.container.children[1];
-	var name = this.config.city;
+	var name = this.selected[1].name;
 	var options = this.createOptions(data,name);
 	this.clearItems(city);
 	city.appendChild(options.items);
-	if(data){
-		this.cityId = options.id ||data[0].id;
-	}
+	this.selected[1].id = options.id ||data[0].id;
+	this.selected[1].name = name||data[0].value;
 	city.onchange = this.handleChangeCity.bind(this);
 }
 
@@ -157,7 +165,7 @@ Selector.prototype.createCity=function(){
 Selector.prototype.createDistrict=function(){
 	var data = this.getDistrictData();
 	var district = this.container.children[2];
-	var name = this.config.district;
+	var name = this.selected[2].name;
 	var options = this.createOptions(data,name);
 	this.clearItems(district);
 	district.appendChild(options.items);
@@ -165,7 +173,8 @@ Selector.prototype.createDistrict=function(){
 		district.style.display='none';
 	}else{
 		district.style.display='block';
-		this.districtId = options.id||data[0].id;
+		this.selected[2].id = options.id||data[0].id;
+		this.selected[2].name=name||data[0].value;
 	}
 	district.onchange = this.handleChangeDistrict.bind(this);
 }
@@ -180,7 +189,6 @@ Selector.prototype.clearItems = function(node){
 	node.innerHTML='';
 }
 
-Selector.prototype.getDistrictId = function(){
-	//console.log(this.districtId)
-	return this.districtId;
+Selector.prototype.getSeleted = function(){
+	return this.selected;
 }
