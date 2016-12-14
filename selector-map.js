@@ -74,6 +74,7 @@ Selector.prototype.handleChangeProvence=function(e){
 	this.selected[2]={};
 	this.createCity();
 	this.createDistrict();
+	this.showmap();
 }
 
 /**
@@ -87,6 +88,7 @@ Selector.prototype.handleChangeCity=function(e){
 	this.selected[1]={id:id,name:name};
 	this.selected[2]={};
 	this.createDistrict();
+	this.showmap();
 }
 
 /**
@@ -98,6 +100,7 @@ Selector.prototype.handleChangeDistrict=function(e){
 	var index = e.target.selectedIndex;
 	var name = e.target.options[index].text;
 	this.selected[2] = {id:id,name:name};
+	this.showmap(name);
 }
 
 /**
@@ -209,3 +212,52 @@ Selector.prototype.getSeleted = function(){
 	return selected;
 }
 
+/**
+ * 获取当前位置的经纬度
+ * @return Array [{name,id},...]
+ */
+Selector.prototype.searchByStationName = function (fn) {
+	var keyword  = this.getSeleted().pop().name; 
+	var map = this.map ? this.map : this.getmap();
+	var localSearch = new BMap.LocalSearch(map);
+	localSearch.setSearchCompleteCallback(function(searchResult) {　　　　
+		var poi = searchResult.getPoi(0);　　　　
+		var point = poi.point.lng + "," + poi.point.lat; //获取经度和纬度　
+		fn && fn(point);
+	});　　
+	localSearch.search(keyword);
+}
+
+/**
+ * 在地图上显示
+ */
+Selector.prototype.showmap = function (keyword) {
+	// 百度地图API功能
+	if(!keyword){
+		keyword  = this.getSeleted().pop().name; 
+	}
+	var map = this.map ? this.map : this.getmap();
+	var localSearch = new BMap.LocalSearch(map);
+	map.clearOverlays();//清空原来的标注
+	localSearch.setSearchCompleteCallback(function(searchResult) {　　　　
+		var poi = searchResult.getPoi(0);　　　　
+		var new_point = new BMap.Point(poi.point.lng, poi.point.lat); 
+		var marker = new BMap.Marker(new_point);  // 创建标注，为要查询的地址对应的经纬度
+        map.addOverlay(marker);
+		var point = poi.point.lng + "," + poi.point.lat; //获取经度和纬度　
+		map.centerAndZoom(new_point, 16);  // 初始化地图,设置中心点坐标和地图级别
+		map.panTo(new_point);
+	});　　
+	//map.centerAndZoom(keyword, 11);
+	localSearch.search(keyword);
+
+}
+
+/**
+ * 获取地图实例
+ */
+Selector.prototype.getmap = function(){
+	var map = new BMap.Map("container");
+	this.map = map;
+	return map;
+}
